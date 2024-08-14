@@ -60,27 +60,32 @@ def main():
     aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
     region_name = os.getenv('AWS_DEFAULT_REGION')
 
-    # Load CloudFront distribution IDs from environment variables
+    # Load CloudFront distribution IDs and corresponding site names/URLs from environment variables
     distribution_ids = {
-        '1': os.getenv('DISTRIBUTION_ID_1'),
-        '2': os.getenv('DISTRIBUTION_ID_2')
+        '1': {'id': os.getenv('DISTRIBUTION_ID_1'), 'name': 'https://stg.company.com'},
+        '2': {'id': os.getenv('DISTRIBUTION_ID_2'), 'name': 'https://stg.admin.com'} # Add more distributions as needed
     }
 
-    # Prompt the user to select a distribution, you can modify the number of choices afte adding a distibuion in distribution_ids
-    print("Select the CloudFront distribution to invalidate:")
-    print("1: stg.company")
-    print("2: stg.admin")
-    choice = input("Enter 1 or 2: ").strip()
+    # Prompt the user to select distributions
+    print("Select the CloudFront distributions to invalidate (e.g., 1,2,3):")
+    for key, value in distribution_ids.items():
+        print(f"{key}: {value['name']}")
 
-    if choice not in distribution_ids or distribution_ids[choice] is None:
-        print("Invalid choice. Please enter 1 or 2.")
+    choices = input("Enter your choices (comma-separated): ").strip().split(',')
+
+    selected_distributions = [distribution_ids[choice.strip()] for choice in choices if choice.strip() in distribution_ids]
+
+    if not selected_distributions:
+        print("Invalid choice(s). Please enter valid numbers corresponding to the distributions.")
         sys.exit(1)
 
     # Paths to invalidate
     paths_to_invalidate = ['/*']  # You can customize the paths here
 
-    # Invalidate the selected distribution
-    create_invalidation(distribution_ids[choice], paths_to_invalidate, aws_access_key, aws_secret_key, region_name)
+    # Invalidate the selected distributions
+    for distribution in selected_distributions:
+        print(f"Invalidating {distribution['name']}...")
+        create_invalidation(distribution['id'], paths_to_invalidate, aws_access_key, aws_secret_key, region_name)
 
 if __name__ == "__main__":
     main()
