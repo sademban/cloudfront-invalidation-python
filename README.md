@@ -18,7 +18,7 @@ https://docs.python.org/3/using/mac.html
 ***download 3.12.5:*** 
 https://www.python.org/downloads/macos/
 
-## setting up & running 
+## setting up & running the script to invalidate
 windows
 ```
 1. clone the repository
